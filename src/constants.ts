@@ -257,7 +257,7 @@ export const editMentionRegex = /(?:\s|^)@\`(.*?)\`/ig;
 
 export const specialCharsRegex = /[^A-Za-z0-9]/;
 
-export const shortNoteLimit = 180; // This is words + (spaces | linebreaks)
+export const shortNoteLimit = 400; // This is words + (spaces | linebreaks)
 
 export const medZapLimit = 1000;
 
