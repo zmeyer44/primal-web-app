@@ -40,7 +40,7 @@ import { hookForDev } from '../../lib/devTools';
 import { getMediaUrl as getMediaUrlDefault } from "../../lib/media";
 import NoteImage from '../NoteImage/NoteImage';
 import { createStore } from 'solid-js/store';
-import { linebreakRegex, specialCharsRegex, urlExtractRegex } from '../../constants';
+import { linebreakRegex, shortNoteLimit, specialCharsRegex, urlExtractRegex } from '../../constants';
 
 
 const convertHTMLEntity = (text: string) => {
@@ -60,19 +60,24 @@ const ParsedNote: Component<{
   ignoreLinebreaks?: boolean,
   noLinks?: 'links' | 'text',
   noPreviews?: boolean,
+  shorten?: boolean,
 }> = (props) => {
 
   const media = useMediaContext();
 
+  const [origTokens, setOrigTokens] = createStore<string[]>([])
   const [tokens, setTokens] = createStore<string[]>([])
 
   const parseContent = () => {
     const content = props.ignoreLinebreaks ?
       props.note.post.content.replace(/\s+/g, ' __SP__ ') :
       props.note.post.content.replace(linebreakRegex, ' __LB__ ').replace(/\s+/g, ' __SP__ ');
+
     const tokens = content.split(/[\s]+/);
 
-    setTokens(() => [...tokens]);
+    setOrigTokens(() => [...tokens]);
+
+    setTokens(() => [...tokens.slice(0, props.shorten ? shortNoteLimit : undefined)]);
   }
 
   const parseToken: (token: string) => JSXElement  = (token: string) => {
@@ -466,6 +471,11 @@ const ParsedNote: Component<{
       <For each={tokens}>
         {(token) => <>{parseToken(token)}</>}
       </For>
+      <Show when={props.shorten && origTokens.length > shortNoteLimit}>
+        <span class={styles.more}>
+          ... <span class="linkish">see more</span>
+        </span>
+      </Show>
     </div>
   );
 };

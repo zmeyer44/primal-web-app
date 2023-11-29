@@ -187,7 +187,7 @@ const Thread: Component = () => {
           <For each={replyNotes()}>
             {note =>
               <div class={styles.threadList}>
-                <Note note={note} />
+                <Note note={note} shorten={true} />
               </div>
             }
           </For>
